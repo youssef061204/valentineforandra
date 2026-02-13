@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Andra 💗</title>
+  <style>
+    :root{
+      --bg1:#ff7ab6;
+      --bg2:#ffb3d9;
+      --card:#ffffffcc;
+      --stroke:#ffffff80;
+      --text:#2b0a1a;
+      --muted:#6b1b3d;
+      --yes:#ff3d8d;
+      --yes2:#ff77b3;
+      --no:#ffffffa8;
+    }
+    *{ box-sizing:border-box; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; }
+    body{
+      margin:0; min-height:100vh; display:grid; place-items:center;
+      background: radial-gradient(900px 600px at 50% 20%, #fff 0%, var(--bg2) 35%, var(--bg1) 100%);
+      overflow:hidden;
+      color:var(--text);
+    }
+
+    /* floating background hearts */
+    .bg-hearts{
+      position:fixed; inset:0; pointer-events:none; opacity:.35;
+      filter: blur(.2px);
+    }
+    .bg-heart{
+      position:absolute;
+      font-size: 18px;
+      animation: floatUp linear infinite;
+      transform: translateY(110vh);
+    }
+    @keyframes floatUp{
+      from { transform: translateY(110vh) translateX(0); opacity:0; }
+      10% { opacity:1; }
+      to   { transform: translateY(-20vh) translateX(40px); opacity:0; }
+    }
+
+    .card{
+      width:min(560px, 92vw);
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: 26px;
+      padding: 30px 24px 22px;
+      box-shadow: 0 25px 90px rgba(140, 10, 70, .25);
+      backdrop-filter: blur(10px);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .badge{
+      display:inline-flex; gap:8px; align-items:center;
+      font-size:12px; color:var(--muted);
+      border:1px solid #ffffffa0;
+      background:#ffffff90;
+      padding:6px 10px;
+      border-radius:999px;
+    }
+
+    h1{
+      margin:12px 0 8px;
+      font-size: 30px;
+      letter-spacing:.2px;
+    }
+    p{
+      margin:0 0 16px;
+      color:var(--muted);
+      line-height:1.35;
+    }
+
+    .arena{
+      margin-top: 16px;
+      height: 210px;
+      border-radius: 22px;
+      border: 1px dashed #ffffffb0;
+      background: linear-gradient(180deg, #ffffff70 0%, #ffffff40 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn{
+      position:absolute;
+      padding: 13px 18px;
+      border-radius: 999px;
+      border: 1px solid #ffffffb0;
+      cursor: pointer;
+      user-select:none;
+      transition: transform 160ms ease, left 240ms ease, top 240ms ease, opacity 160ms ease, filter 160ms ease;
+      font-weight: 700;
+      letter-spacing:.2px;
+    }
+
+    .yes{
+      left: 26%;
+      top: 58%;
+      transform: translate(-50%,-50%);
+      background: linear-gradient(180deg, var(--yes2), var(--yes));
+      color:white;
+      border-color:#ffffff90;
+      box-shadow: 0 10px 30px rgba(255, 61, 141, .35);
+    }
+    .yes:hover{
+      transform: translate(-50%,-50%) scale(1.06);
+      filter: brightness(1.05);
+    }
+
+    .no{
+      left: 74%;
+      top: 58%;
+      transform: translate(-50%,-50%);
+      background: var(--no);
+      color: #5d1231;
+      backdrop-filter: blur(8px);
+    }
+
+    .result{
+      margin-top: 16px;
+      min-height: 26px;
+      font-size: 16px;
+      font-weight: 650;
+    }
+
+    .sub{
+      margin-top: 10px;
+      font-size: 12px;
+      color: rgba(43,10,26,.65);
+    }
+
+    /* burst hearts on yes */
+    .burst{
+      position:absolute;
+      left:0; top:0;
+      width:10px; height:10px;
+      pointer-events:none;
+    }
+    .particle{
+      position:absolute;
+      font-size: 16px;
+      will-change: transform, opacity;
+      animation: pop 900ms ease-out forwards;
+    }
+    @keyframes pop{
+      from { transform: translate(0,0) scale(0.7); opacity:1; }
+      to { transform: translate(var(--dx), var(--dy)) scale(1.2); opacity:0; }
+    }
+
+    /* small corner shine */
+    .shine{
+      position:absolute;
+      inset:-80px;
+      background: radial-gradient(circle at 30% 25%, rgba(255,255,255,.7), transparent 45%);
+      transform: rotate(-10deg);
+      pointer-events:none;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-hearts" id="bgHearts"></div>
+
+  <div class="card">
+    <div class="shine"></div>
+    <div class="badge">💘 For Andra • Valentine request</div>
+    <h1>Andra, will you be my Valentine?</h1>
+    <p>There are two buttons. One is brave. One is allergic to commitment.</p>
+
+    <div class="arena" id="arena">
+      <button class="btn yes" id="yesBtn">Yes 💗</button>
+      <button class="btn no" id="noBtn">No</button>
+    </div>
+
+    <div class="result" id="result"></div>
+    <div class="sub">Tip: if the “No” button moves, that’s intentional 🙂</div>
+  </div>
+
+  <script>
+    // ===== background floating hearts =====
+    const bg = document.getElementById("bgHearts");
+    const heartChars = ["💗","💖","💘","💕","💞","💓"];
+    for (let i = 0; i < 26; i++) {
+      const s = document.createElement("div");
+      s.className = "bg-heart";
+      s.textContent = heartChars[Math.floor(Math.random()*heartChars.length)];
+      s.style.left = Math.random()*100 + "vw";
+      s.style.animationDuration = (8 + Math.random()*10) + "s";
+      s.style.animationDelay = (Math.random()*8) + "s";
+      s.style.fontSize = (14 + Math.random()*18) + "px";
+      bg.appendChild(s);
+    }
+
+    // ===== no button behavior =====
+    const arena = document.getElementById("arena");
+    const noBtn = document.getElementById("noBtn");
+    const yesBtn = document.getElementById("yesBtn");
+    const result = document.getElementById("result");
+
+    const noTexts = ["No", "Nope", "Not today", "Wait…", "Stop 😭", "Ok ok"];
+    let dodges = 0;
+    let locked = false;
+
+    function rand(min, max){ return Math.floor(Math.random()*(max-min+1))+min; }
+
+    function moveNo(){
+      if (locked) return;
+
+      const rect = arena.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+      const pad = 14;
+      const maxX = rect.width - btnRect.width - pad;
+      const maxY = rect.height - btnRect.height - pad;
+
+      const x = rand(pad, Math.max(pad, maxX));
+      const y = rand(pad, Math.max(pad, maxY));
+
+      noBtn.style.left = `${x}px`;
+      noBtn.style.top  = `${y}px`;
+      noBtn.style.transform = `translate(0,0)`;
+
+      dodges++;
+      noBtn.textContent = noTexts[Math.min(dodges, noTexts.length-1)];
+
+      const scale = Math.max(0.72, 1 - dodges*0.06);
+      const opacity = Math.max(0.50, 1 - dodges*0.08);
+      noBtn.style.transform = `translate(0,0) scale(${scale})`;
+      noBtn.style.opacity = opacity;
+
+      if (dodges >= 5) {
+        locked = true;
+        noBtn.textContent = "Ok ok";
+        noBtn.style.opacity = 0.85;
+      }
+    }
+
+    noBtn.addEventListener("mouseenter", moveNo);
+    noBtn.addEventListener("click", () => locked ? (result.textContent = "Fair. But the correct answer is still Yes.") : moveNo());
+    noBtn.addEventListener("touchstart", (e) => { e.preventDefault(); moveNo(); }, { passive:false });
+
+    // ===== heart burst on yes =====
+    function burstHearts(x, y){
+      const burst = document.createElement("div");
+      burst.className = "burst";
+      burst.style.left = x + "px";
+      burst.style.top  = y + "px";
+      arena.appendChild(burst);
+
+      const count = 18;
+      for (let i=0;i<count;i++){
+        const p = document.createElement("div");
+        p.className = "particle";
+        p.textContent = heartChars[Math.floor(Math.random()*heartChars.length)];
+
+        const angle = (Math.PI*2) * (i / count);
+        const r = 30 + Math.random()*70;
+        const dx = Math.cos(angle) * r;
+        const dy = Math.sin(angle) * r - (20 + Math.random()*30);
+
+        p.style.setProperty("--dx", dx + "px");
+        p.style.setProperty("--dy", dy + "px");
+        p.style.left = "0px";
+        p.style.top  = "0px";
+        p.style.fontSize = (14 + Math.random()*10) + "px";
+
+        burst.appendChild(p);
+      }
+
+      setTimeout(() => burst.remove(), 1000);
+    }
+
+    yesBtn.addEventListener("click", (e) => {
+      const rect = arena.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      burstHearts(x, y);
+
+      result.textContent = "YES ✅ Andra, you’re officially my Valentine 💗";
+      yesBtn.disabled = true;
+      noBtn.disabled = true;
+      yesBtn.style.opacity = 0.92;
+      noBtn.style.opacity = 0.35;
+    });
+  </script>
+</body>
+</html>
